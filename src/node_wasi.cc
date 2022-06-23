@@ -72,7 +72,6 @@ inline void Debug(WASI* wasi, Args&&... args) {
     }                                                                         \
   } while (0)
 
-
 using v8::Array;
 using v8::BackingStore;
 using v8::BigInt;
@@ -1641,18 +1640,18 @@ void WASI::SockShutdown(const FunctionCallbackInfo<Value>& args) {
 
 void WASI::_SetMemory(const FunctionCallbackInfo<Value>& args) {
   WASI* wasi;
+  ASSIGN_OR_RETURN_UNWRAP(&wasi, args.This());
   CHECK_EQ(args.Length(), 1);
   if (!args[0]->IsWasmMemoryObject()) {
     return node::THROW_ERR_INVALID_ARG_TYPE(
-        env, "instance.exports.memory must be a WebAssembly.Memory object");
+        wasi->env(),
+        "instance.exports.memory must be a WebAssembly.Memory object");
   }
-  ASSIGN_OR_RETURN_UNWRAP(&wasi, args.This());
   wasi->memory_.Reset(wasi->env()->isolate(), args[0].As<WasmMemoryObject>());
 }
 
 
 uvwasi_errno_t WASI::backingStore(char** store, size_t* byte_length) {
-  Environment* env = this->env();
   Local<WasmMemoryObject> memory = PersistentToLocal::Strong(this->memory_);
   std::shared_ptr<BackingStore> backing_store =
       memory->Buffer()->GetBackingStore();
