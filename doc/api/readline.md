@@ -272,6 +272,8 @@ the `'close'` event will be emitted.
 Calling `rl.close()` does not immediately stop other events (including `'line'`)
 from being emitted by the `InterfaceConstructor` instance.
 
+As a side-effect, calling `rl.close()` will also pause the input stream.
+
 ### `rl.pause()`
 
 <!-- YAML
